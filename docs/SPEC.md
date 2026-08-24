@@ -3,12 +3,12 @@
 | | |
 |---|---|
 | **Document ID** | EXEM-AGT-001 |
-| **Version** | 1.1.0 |
+| **Version** | 1.2.0 |
 | **Status** | Draft — Approved for prototyping, not yet approved for scheduled/unattended operation |
-| **Owner** | Bob Taylor |
+| **Owner** | Bobby Taylor, Exem Concepts |
 | **Governing framework** | AI Agent Development & Learning Plan (AI_Agent_Development.docx) |
 | **Target environment (this version)** | Personal Gmail (admin rights) — MVP only |
-| **Future environment (out of scope, this version)** TBD
+| **Future environment (out of scope, this version)** | Microsoft 365 / Graph API, multi-tenant, for Pete's MSP clients |
 
 ---
 
@@ -19,6 +19,7 @@
 | 0.1.0 | 2026-08-24 | Bobby Taylor + Claude | Initial informal draft. Static whitelist, no logging, no persistence layer. Superseded. |
 | 1.0.0 | 2026-08-24 | Bobby Taylor + Claude | Full SME rewrite. Added persistent audit log (every candidate, every classification reason), living sender-decision store replacing static whitelist, SQLite data model, ambiguous-candidate escalation workflow, non-functional requirements, acceptance criteria, git version control. |
 | 1.1.0 | 2026-08-24 | Bobby Taylor + Claude | Simplified for personal-MVP scale, per direct owner feedback that full audit logging was over-engineered for a single personal inbox. Replaced SQLite with a single JSON file. Replaced the full audit log (every candidate + classification + signals) with a minimal trashed-log (only messages actually trashed, no reasoning detail retained). Sender decision store (whitelist/blacklist/pending) retained as-is — it drives behavior, not just logging, so it stays. Full audit logging is deferred to whenever this pattern is adapted for client-facing/M365 use, where a defensible record of agent decisions becomes a real requirement. |
+| 1.2.0 | 2026-08-24 | Bobby Taylor + Claude | Added Section 10 item on UI/frontend strategy: the frontend is deliberately deferred and undecided, and the backend (`agent/*.py`) is being built UI-agnostic on purpose — no CLI, GUI, or API-consumer assumptions baked into `store.py`, `gmail_client.py`, `classify.py`, or `workflow.py`. Documented now so this isn't quietly decided by default before there's evidence for what a production UI should be (native Windows GUI, a Flutter cross-platform client talking to a local API layer, a browser-based tool, or continued CLI). |
 
 Change requests against this spec should be made as edits to `docs/SPEC.md` with an updated Version History row. Do not silently edit prior sections without a version bump.
 
@@ -26,7 +27,7 @@ Change requests against this spec should be made as edits to `docs/SPEC.md` with
 
 ## 1. Purpose & Business Context
 
-MPV for a Client that needs a working reference pattern for an email-triage agent: scan → classify → hold for human review → act.
+Bobby (Exem Concepts, 1099 contractor to Pete's MSP) needs a working reference pattern for an email-triage agent: scan → classify → hold for human review → act. This is the first agent built under the governing Learning Plan and is intended to generalize: the classification and review-gate pattern developed here is the template for future client-facing agents in Pete's tiered AI service offering (M365/Graph API target, out of scope for this version).
 
 **Primary use case:** reduce inbox clutter from bulk marketing email without risking loss of anything from a real correspondent.
 
@@ -43,6 +44,7 @@ MPV for a Client that needs a working reference pattern for an email-triage agen
 - Persistent sender-decision memory (JSON file)
 - A minimal log of what was actually trashed
 - Manual trigger (Phase 1) and unattended weekly trigger (Phase 2)
+- A CLI entry point (`main.py`) sufficient to run and validate the agent end-to-end
 
 ### 2.2 Out of scope (this version)
 - Microsoft 365 / Outlook / Graph API — requires separate M365 Developer Program sandbox effort
@@ -51,6 +53,7 @@ MPV for a Client that needs a working reference pattern for an email-triage agen
 - Folders/labels other than Inbox
 - Permanent deletion (explicitly disallowed, see Section 8.2)
 - Full audit trail of every evaluated candidate (deferred — see Section 10)
+- Any production-facing UI decision (native GUI, cross-platform app, web UI) — deferred, see Section 10
 
 ---
 
@@ -130,6 +133,8 @@ Every ambiguous candidate resolved by the user (FR-5) is written back as `whitel
 ### 5.5 Write discipline
 Because a JSON file has no transactional guarantees, every write to `data/store.json` MUST follow an atomic-replace pattern: write the full updated structure to a temp file in the same directory, then rename the temp file over the original. Partial writes (a crash mid-write) must never be able to leave `data/store.json` truncated or invalid. This is a hard requirement — see Section 8.1.
 
+Sender-decision writes (`set_sender_decision`) persist immediately, not batched — losing an ask-once answer to a crash would break FR-5's "never ask again" guarantee. Trashed-log writes may be batched, since the Gmail Trash action itself is the actual source of truth for a deletion having happened.
+
 ### 5.6 What is deliberately NOT stored
 Per-run scan results, held/skipped candidates, and classification reasoning are not persisted anywhere. They exist only in the review-list output shown to Bobby during a run and are gone once the run ends. If Bobby later wants that history retained, that's a spec change (see Section 10).
 
@@ -162,7 +167,7 @@ Note (revised in 1.1.0): this classification happens in-memory during a run and 
 2. **Pre-filter** — drop anything with sender decision `whitelist`
 3. **Fast-path** — anything with sender decision `blacklist` skips straight to candidate list (classification already resolved for this sender)
 4. **Classify** — apply Section 6.2 to everything else
-5. **Resolve ambiguous** — for each ambiguous sender not already `pending` in the store, ask the user once; persist the answer (FR-5)
+5. **Resolve ambiguous** — for each ambiguous sender not already `pending` in the store, ask the user once; persist the answer immediately (FR-5, Section 5.5)
 6. **Present** — review list of confirmed bulk-marketing candidates, grouped by sender, with subject/date
 7. **Approve** — user confirms all, some, or none
 8. **Act** — move approved messages to Trash only
@@ -211,16 +216,21 @@ Note (revised in 1.1.0): this classification happens in-memory during a run and 
 | 3 | Performance/cost budget (API calls per run, LLM classification cost per candidate) not yet specified. | Open |
 | 4 | Full audit logging (every candidate, classification, signals) was deliberately dropped in 1.1.0 for personal-scale use. **Must be reinstated** before this pattern is offered to any client through Pete's MSP — a client will reasonably expect a defensible record of what an agent did to their inbox and why. | Deferred, revisit before client use |
 | 5 | Multi-tenant generalization (M365/Graph, per-client sender stores) intentionally deferred — do not build for it prematurely. | Deferred by design |
+| 6 | Production-facing UI is undecided and deliberately deferred. Options on the table: continued CLI, a native Windows GUI (Tkinter/Flet/PyQt), or a Flutter cross-platform client — the latter would require the backend to expose a local API layer (e.g. FastAPI) rather than being called in-process, a real architectural change, not just a UI skin. The backend (`agent/*.py`) is being built UI-agnostic on purpose so this decision can be made later, based on evidence from the working CLI, without having locked in assumptions prematurely. | Deferred by design |
 
 ---
 
 ## Appendix A — Whitelist Seed List (v1, 2026-08-24)
+```
 doris1122@icloud.com
 doris_761122@hotmail.com
 nb@marinasailing.com
 hansmollym@gmail.com
 newsong@newsongworshipcenter.ccsend.com
 newsong@newsong.cc
+```
 
 ## Appendix B — Reference Gmail Query
+```
 category:promotions older_than:14d
+```

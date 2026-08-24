@@ -5,6 +5,8 @@ __pycache__/
 node_modules/
 .env
 *.log
+.venv/
+.pytest_cache/
 
 # OAuth client secrets and tokens — never commit
 credentials/

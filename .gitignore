@@ -5,3 +5,9 @@ __pycache__/
 node_modules/
 .env
 *.log
+
+# OAuth client secrets and tokens — never commit
+credentials/
+
+# Runtime data store — generated from data/store.seed.json on first run
+data/store.json

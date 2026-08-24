@@ -5,10 +5,10 @@
 | **Document ID** | EXEM-AGT-001 |
 | **Version** | 1.1.0 |
 | **Status** | Draft — Approved for prototyping, not yet approved for scheduled/unattended operation |
-| **Owner** | Bobby Taylor, Exem Concepts |
+| **Owner** | Bob Taylor |
 | **Governing framework** | AI Agent Development & Learning Plan (AI_Agent_Development.docx) |
 | **Target environment (this version)** | Personal Gmail (admin rights) — MVP only |
-| **Future environment (out of scope, this version)** | Microsoft 365 / Graph API, multi-tenant, for Pete's MSP clients |
+| **Future environment (out of scope, this version)** TBD
 
 ---
 
@@ -26,7 +26,7 @@ Change requests against this spec should be made as edits to `docs/SPEC.md` with
 
 ## 1. Purpose & Business Context
 
-Bobby (Exem Concepts, 1099 contractor to Pete's MSP) needs a working reference pattern for an email-triage agent: scan → classify → hold for human review → act. This is the first agent built under the governing Learning Plan and is intended to generalize: the classification and review-gate pattern developed here is the template for future client-facing agents in Pete's tiered AI service offering (M365/Graph API target, out of scope for this version).
+MPV for a Client that needs a working reference pattern for an email-triage agent: scan → classify → hold for human review → act.
 
 **Primary use case:** reduce inbox clutter from bulk marketing email without risking loss of anything from a real correspondent.
 

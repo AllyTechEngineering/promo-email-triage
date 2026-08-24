@@ -1,6 +1,6 @@
 # Promo Email Triage Agent
 
-MVP agent that scans a Gmail inbox for bulk-marketing email, classifies it with a mix of Gmail's own tagging and content-signal checks, and — only after human review — moves approved messages to Trash. Never permanently deletes. Built as the first reference agent under Exem Concepts' AI Agent Development & Learning Plan.
+MVP agent that scans a Gmail inbox for bulk-marketing email, classifies it with a mix of Gmail's own tagging and content-signal checks, and — only after human review — moves approved messages to Trash. Never permanently deletes. 
 
 ## Status
 Spec finalized (v1.1.0). Prototyping in progress. Not yet built as standalone scheduled code — currently being validated interactively.
@@ -28,4 +28,4 @@ Storage moved from SQLite to a single JSON file, and logging was scaled back fro
 Personal Gmail (admin rights). Microsoft 365 / Graph API is a deliberately deferred, separate effort — see `docs/SPEC.md` Section 2.2 and Section 10, item 5.
 
 ## Version control
-This repo is git-controlled locally (tags `v0.1.0`, `v1.0.0`; `v1.1.0` pending tag once these file updates are committed). Not yet pushed to GitHub — the GitHub connector wasn't cooperating, so files are currently synced into this Claude Project's knowledge store manually for review instead. Revisit pushing to a real GitHub remote once that's sorted out.
+This repo is git-controlled locally (tags `v0.1.0`, `v1.0.0`; `v1.1.0` pending tag once these file updates are committed).

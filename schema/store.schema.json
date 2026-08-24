@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Promo Email Triage Data Store",
+  "description": "Validates data/store.json — see docs/SPEC.md Section 5",
+  "type": "object",
+  "required": ["meta", "sender_decisions", "trashed_log"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["schema_version", "updated_at"],
+      "properties": {
+        "schema_version": { "type": "string" },
+        "updated_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "sender_decisions": {
+      "type": "object",
+      "description": "Keyed by sender email address",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["decision", "source", "created_at", "updated_at"],
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": ["whitelist", "blacklist", "pending"]
+          },
+          "source": {
+            "type": "string",
+            "enum": ["seed_list", "agent_inferred", "user_confirmed"]
+          },
+          "notes": { "type": ["string", "null"] },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "trashed_log": {
+      "type": "array",
+      "description": "One entry per message actually moved to Trash. No classification/signal detail retained — see SPEC.md Section 5.6.",
+      "items": {
+        "type": "object",
+        "required": ["message_id", "sender_email", "trashed_at"],
+        "properties": {
+          "message_id": { "type": "string" },
+          "thread_id": { "type": "string" },
+          "sender_email": { "type": "string" },
+          "subject": { "type": "string" },
+          "trashed_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  }
+}

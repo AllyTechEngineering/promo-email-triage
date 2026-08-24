@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "schema_version": "1.1.0",
+    "updated_at": "2026-08-24T00:00:00Z"
+  },
+  "sender_decisions": {
+    "doris1122@icloud.com": {
+      "decision": "whitelist",
+      "source": "seed_list",
+      "notes": null,
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z"
+    },
+    "doris_761122@hotmail.com": {
+      "decision": "whitelist",
+      "source": "seed_list",
+      "notes": null,
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z"
+    },
+    "nb@marinasailing.com": {
+      "decision": "whitelist",
+      "source": "seed_list",
+      "notes": null,
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z"
+    },
+    "hansmollym@gmail.com": {
+      "decision": "whitelist",
+      "source": "seed_list",
+      "notes": null,
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z"
+    },
+    "newsong@newsongworshipcenter.ccsend.com": {
+      "decision": "whitelist",
+      "source": "seed_list",
+      "notes": null,
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z"
+    },
+    "newsong@newsong.cc": {
+      "decision": "whitelist",
+      "source": "seed_list",
+      "notes": null,
+      "created_at": "2026-08-24T00:00:00Z",
+      "updated_at": "2026-08-24T00:00:00Z"
+    }
+  },
+  "trashed_log": []
+}

@@ -28,3 +28,10 @@ GMAIL_SEARCH_QUERY_TEMPLATE = "category:promotions older_than:{days}d"
 # delete. Requesting the narrower scope backs up the Trash-only guardrail
 # in Section 8.2 at the permissions level, not just in application logic.
 GMAIL_SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
+
+# Section 2.1 scopes this agent to one specific personal account, not a
+# generalized multi-tenant tool (Section 10 #5 — deferred by design).
+# gmail_client.get_authenticated_service() verifies this before any run
+# proceeds, guarding against a stale or mis-consented token.json silently
+# running search/trash against the wrong mailbox.
+EXPECTED_GMAIL_ACCOUNT = "bob.taylor.mba@gmail.com"

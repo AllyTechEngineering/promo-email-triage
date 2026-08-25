@@ -2,3 +2,5 @@ google-api-python-client>=2.100.0
 google-auth-oauthlib>=1.2.0
 google-auth-httplib2>=0.2.0
 jsonschema>=4.20.0
+# jsonschema silently skips "format": "date-time" checks unless this is installed
+rfc3339-validator>=0.1.4

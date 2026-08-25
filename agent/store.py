@@ -50,7 +50,12 @@ def _validate(data: dict[str, Any], schema_path: Path) -> None:
     with open(schema_path, "r", encoding="utf-8") as f:
         schema = json.load(f)
     try:
-        jsonschema.validate(instance=data, schema=schema)
+        # jsonschema.validate() ignores "format" keywords (e.g. date-time)
+        # unless a FormatChecker is passed explicitly, and date-time itself
+        # is only registered on that checker if rfc3339-validator is
+        # installed (see requirements.txt) — without both, every
+        # "format": "date-time" in store.schema.json is a silent no-op.
+        jsonschema.validate(instance=data, schema=schema, format_checker=jsonschema.FormatChecker())
     except jsonschema.ValidationError as e:
         raise StoreValidationError(f"data/store.json failed schema validation: {e.message}") from e
 

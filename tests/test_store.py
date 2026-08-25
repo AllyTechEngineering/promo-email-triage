@@ -79,6 +79,26 @@ def test_load_store_rejects_schema_violation(store_path):
         store.load_store(store_path, SEED_PATH, SCHEMA_PATH)
 
 
+def test_load_store_rejects_malformed_timestamp(store_path):
+    # Otherwise schema-valid, but meta.updated_at isn't a real date-time.
+    # jsonschema.validate() silently ignores "format" keywords unless a
+    # FormatChecker is passed, and even then "date-time" isn't registered
+    # without rfc3339-validator installed — this test exists specifically
+    # to prove that gap is actually closed, not just documented.
+    store_path.write_text(
+        json.dumps(
+            {
+                "meta": {"schema_version": "1.1.0", "updated_at": "not-a-real-timestamp"},
+                "sender_decisions": {},
+                "trashed_log": [],
+            }
+        )
+    )
+
+    with pytest.raises(store.StoreValidationError):
+        store.load_store(store_path, SEED_PATH, SCHEMA_PATH)
+
+
 def test_get_sender_decision_is_case_insensitive(store_path):
     data = store.load_store(store_path, SEED_PATH, SCHEMA_PATH)
 
